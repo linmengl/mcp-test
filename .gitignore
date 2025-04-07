@@ -1,0 +1,12 @@
+/pictureclassify/ckpts/
+/pytorch/data/MNIST/raw/
+/pytorch/test/model/
+/picturecut/ckpts/
+/picturecut/data/cat_output/SegmentationClassNpy/
+/picturecut/data/cat_output/SegmentationClassVisualization/
+/picturecut/data/cat_output/SegmentationObject/
+/picturecut/data/cat_output/SegmentationObjectNpy/
+/picturecut/data/cat_output/SegmentationObjectVisualization/
+/picturecut/data/cat_output/class_names.txt
+/pytorch/test/data/
+/rag-app/bge-small-zh-v1.5/
