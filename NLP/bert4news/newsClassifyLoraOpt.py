@@ -3,7 +3,6 @@ import torch
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model
 from sklearn.metrics import accuracy_score, f1_score
-from torch.utils.data import DataLoader
 from transformers import BertTokenizer, BertForSequenceClassification, Trainer, TrainingArguments
 from transformers import DataCollatorWithPadding
 
@@ -14,6 +13,7 @@ def split_label_text(example):
         "label": parts[0],
         "text": parts[1] if len(parts) > 1 else ""
     }
+
 
 # 1. 加载今日头条数据集
 # 应用到每个子集
@@ -44,7 +44,6 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # 初始化模型
 model = BertForSequenceClassification.from_pretrained("bert-base-chinese", num_labels=num_labels)
 
-
 # 配置 LoRA
 config = LoraConfig(
     r=8,  # 低秩矩阵的秩
@@ -72,7 +71,6 @@ dataset = dataset.map(tokenize_fc, batched=True)
 # 4. 数据整理器
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-
 # 训练参数
 training_args = TrainingArguments(
     output_dir="./output",
@@ -97,14 +95,12 @@ def compute_metrics(eval_pred):
         "f1": f1_score(labels, predictions, average="macro")
     }
 
-train_dataset = dataset["train"]
-train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=8, num_workers=4)
 
 # 8. 初始化 Trainer
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=train_dataloader,
+    train_dataset=dataset["train"],
     eval_dataset=dataset["validation"],
     tokenizer=tokenizer,
     data_collator=data_collator,
@@ -131,4 +127,3 @@ with torch.no_grad():
     logits = model(**inputs).logits
 predicted_class_id = torch.argmax(logits).item()
 print("预测类别:", id2label[predicted_class_id])
-

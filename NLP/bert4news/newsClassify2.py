@@ -13,6 +13,7 @@ def split_label_text(example):
         "text": parts[1] if len(parts) > 1 else ""
     }
 
+
 # 1. 加载今日头条数据集
 # 应用到每个子集
 dataset = load_dataset("spiritx2023/ThuCnews", cache_dir="./data")
@@ -52,7 +53,6 @@ dataset = dataset.map(tokenize_fc, batched=True)
 # 4. 数据整理器
 data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-
 # 5. 模型
 model = BertForSequenceClassification.from_pretrained("bert-base-chinese", num_labels=num_labels)
 model = model.to(device)
@@ -82,16 +82,12 @@ def compute_metrics(eval_pred):
         "f1": f1_score(labels, predictions, average="macro")
     }
 
-from torch.utils.data import DataLoader
-
-train_dataset = dataset["train"]
-train_dataloader = DataLoader(train_dataset, batch_size=8, num_workers=4)
 
 # 8. 初始化 Trainer
 trainer = Trainer(
     model=model,
     args=training_args,
-    train_dataset=train_dataloader,
+    train_dataset=dataset["train"],
     eval_dataset=dataset["validation"],
     tokenizer=tokenizer,
     data_collator=data_collator,
