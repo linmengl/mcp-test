@@ -4,7 +4,6 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-<<<<<<< HEAD
     <list default="true" id="99b5d4f4-4ae3-41f4-8b9d-64989d917e33" name="Changes" comment="Changes">
       <change afterPath="$PROJECT_DIR$/NLP/bert11.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/NLP/bert4news/newsClassify2.py" afterDir="false" />
@@ -13,9 +12,6 @@
       <change afterPath="$PROJECT_DIR$/NLP/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
-=======
-    <list default="true" id="99b5d4f4-4ae3-41f4-8b9d-64989d917e33" name="Changes" comment="Changes" />
->>>>>>> 05181cc58c01abfd0d2cc64feb54d5ad7cb881ef
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,26 +39,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.ai-project.executor": "Run",
-    "Python.lstm2.executor": "Run",
-    "Python.newsClassify.executor": "Debug",
-    "Python.newsClassify2.executor": "Debug",
-    "Python.torchtext1.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/Users/menglin/ai-model/ai-project/NLP/bert4news",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.ai-project.executor&quot;: &quot;Run&quot;,
+    &quot;Python.lstm2.executor&quot;: &quot;Run&quot;,
+    &quot;Python.newsClassify.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.newsClassify2.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.torchtext1.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/menglin/ai-model/ai-project/NLP/bert4news&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/NLP/bert4news" />
@@ -117,11 +113,8 @@
       <updated>1741600626192</updated>
       <workItem from="1741600627998" duration="90000" />
       <workItem from="1743991616422" duration="33000" />
-<<<<<<< HEAD
       <workItem from="1744098041980" duration="37988000" />
-=======
       <workItem from="1744098041980" duration="13959000" />
->>>>>>> 05181cc58c01abfd0d2cc64feb54d5ad7cb881ef
     </task>
     <task id="LOCAL-00001" summary="Changes">
       <option name="closed" value="true" />
@@ -141,7 +134,6 @@
     <MESSAGE value="Changes" />
     <option name="LAST_COMMIT_MESSAGE" value="Changes" />
   </component>
-<<<<<<< HEAD
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -170,8 +162,6 @@
       </default-breakpoints>
     </breakpoint-manager>
   </component>
-=======
->>>>>>> 05181cc58c01abfd0d2cc64feb54d5ad7cb881ef
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/ai_project$newsClassify.coverage" NAME="newsClassify 覆盖结果" MODIFIED="1744187562935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/NLP/bert4news" />
     <SUITE FILE_PATH="coverage/ai_project$newsClassify2.coverage" NAME="newsClassify2 覆盖结果" MODIFIED="1744188800017" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/NLP/bert4news" />
