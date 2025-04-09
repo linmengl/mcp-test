@@ -180,7 +180,9 @@ for epoch in range(n_epochs):
     epoch_valid_acc = np.mean(valid_acc)
     if epoch_valid_loss < best_valid_loss:
         best_valid_loss = epoch_valid_loss
-        torch.save(model.state_dict(), 'lstm.pt')
+        torch.save(model.state_dict(), 'data/lstm.pt')
     print(f'epoch: {epoch + 1}')
     print(f'train_loss: {epoch_train_loss:.3f}, train_acc: {epoch_train_acc:.3f}')
     print(f'valid_loss: {epoch_valid_loss:.3f}, valid_acc: {epoch_valid_acc:.3f}')
+
+
