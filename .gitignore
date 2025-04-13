@@ -10,3 +10,9 @@
 /picturecut/data/cat_output/class_names.txt
 /pytorch/test/data/
 /rag-app/bge-small-zh-v1.5/
+/NLP/data/
+/NLP/bert4news/data/
+/NLP/bert4news/output/
+/NLP/multi_cased_L-12_H-768_A-12/
+workspace.xml
+

@@ -71,7 +71,7 @@ if __name__ == "__main__":
             print("最终答案:", final_answer)
             break
 
-        messages.append(response.choices[0].message)
+        messages.append(response_text)
 
         action_match = re.search(r'Action:\s*(\w+)', response_text)
         action_input_match = re.search(r'Action Input:\s*({.*?}|".*?")', response_text, re.DOTALL)

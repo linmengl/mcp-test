@@ -8,3 +8,5 @@ print(' '.join(seg))
 seg2 = posseg.cut(text)
 print([se for se in seg2])
 
+
+print("--------")
