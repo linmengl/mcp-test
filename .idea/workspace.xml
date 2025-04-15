@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="99b5d4f4-4ae3-41f4-8b9d-64989d917e33" name="Changes" comment="Changes">
-      <change afterPath="$PROJECT_DIR$/NLP/bert11.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NLP/bert4news/newsClassify2.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NLP/bert4news/newsClassifyLoraOpt.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NLP/bertSimple1.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/NLP/utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/agent/hybridmcp/client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/agent/hybridmcp/mcpClient.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/agent/hybridmcp/mcpServer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/agent/hybridmcp/server.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -39,28 +38,32 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.ai-project.executor&quot;: &quot;Run&quot;,
-    &quot;Python.lstm2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.newsClassify.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.newsClassify2.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.torchtext1.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/menglin/ai-model/ai-project/NLP/bert4news&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python.ai-project.executor": "Run",
+    "Python.client.executor": "Debug",
+    "Python.lstm2.executor": "Run",
+    "Python.mcpServer.executor": "Run",
+    "Python.newsClassify.executor": "Debug",
+    "Python.newsClassify2.executor": "Debug",
+    "Python.queryweather.executor": "Run",
+    "Python.torchtext1.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/Users/menglin/ai-model/ai-project/agent/hybridmcp",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/agent/hybridmcp" />
       <recent name="$PROJECT_DIR$/NLP/bert4news" />
       <recent name="$PROJECT_DIR$/NLP" />
     </key>
@@ -115,6 +118,7 @@
       <workItem from="1743991616422" duration="33000" />
       <workItem from="1744098041980" duration="37988000" />
       <workItem from="1744098041980" duration="13959000" />
+      <workItem from="1744617946167" duration="9974000" />
     </task>
     <task id="LOCAL-00001" summary="Changes">
       <option name="closed" value="true" />
@@ -152,6 +156,21 @@
           <line>22</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/agent/hybridmcp/client.py</url>
+          <line>26</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/agent/hybridmcp/client.py</url>
+          <line>28</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/agent/hybridmcp/client.py</url>
+          <line>39</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -164,8 +183,11 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/ai_project$newsClassify.coverage" NAME="newsClassify 覆盖结果" MODIFIED="1744187562935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/NLP/bert4news" />
+    <SUITE FILE_PATH="coverage/ai_project$mcpServer.coverage" NAME="mcpServer 覆盖结果" MODIFIED="1744713319168" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/agent/hybridmcp" />
     <SUITE FILE_PATH="coverage/ai_project$newsClassify2.coverage" NAME="newsClassify2 覆盖结果" MODIFIED="1744188800017" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/NLP/bert4news" />
+    <SUITE FILE_PATH="coverage/ai_project$queryweather.coverage" NAME="queryweather 覆盖结果" MODIFIED="1744614110180" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/agent/fc1" />
     <SUITE FILE_PATH="coverage/ai_project$torchtext1.coverage" NAME="torchtext1 覆盖结果" MODIFIED="1744109755175" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/NLP" />
+    <SUITE FILE_PATH="coverage/ai_project$client.coverage" NAME="client 覆盖结果" MODIFIED="1744714646770" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/agent/hybridmcp" />
     <SUITE FILE_PATH="coverage/ai_project$ai_project.coverage" NAME="ai-project Coverage Results" MODIFIED="1741600676104" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/ai_project$lstm2.coverage" NAME="lstm2 覆盖结果" MODIFIED="1744109944148" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/NLP" />
   </component>
