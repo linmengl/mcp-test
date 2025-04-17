@@ -1,4 +1,5 @@
 import json
+import json
 from json.decoder import JSONDecodeError
 # from json_repair import repair_json
 from typing import Optional
@@ -17,11 +18,7 @@ def extract_json(content: str) -> Optional[dict]:
         # 增强版正则匹配（支持嵌套和转义）
         pattern = r'\{(?:[^{}]|\{[^{}]*\})*\}'
         if match := re.search(pattern, content, re.DOTALL):
-            # try:
-            #     return json.loads(match.group())
-            # except JSONDecodeError:
-            #     # 最后尝试修复常见格式错误（如多余逗号）
-            #     return json.loads(repair_json(match.group()))
+
             try:
                 fixed = match.group().replace("'", '"')  # 单引号转双引号
                 return json.loads(fixed)
@@ -66,3 +63,34 @@ async def ollama_chat(messages):
         response = await client.post(ollama_url, json=payload)
         response.raise_for_status()
     return response.json()
+
+def build_system_prompt(tools):
+    prompt = ""
+    for tool in tools:
+        prompt += (
+            f"\n🔧 tool-name: {tool['name']}\n"
+            f"📖 描述: {tool['description']}\n"
+            f"📥 参数结构: {json.dumps(tool['input_schema'], ensure_ascii=False)}\n"
+        )
+    return (
+        f"""You are a helpful assistant with access to the following tools:
+{prompt}
+
+---
+
+📌 任务说明：
+
+- 当你可以独立完成任务时，直接回复格式如下：
+Final Answer: [你的回答]
+
+- 当你需要使用工具时，请仅输出以下格式的 JSON（严格格式）：
+```json
+{{
+  "tool": "tool-name",
+  "arguments": {{
+    "arg1": "xxx",
+    "arg2": "yyy"
+  }}
+}}
+"""
+    )

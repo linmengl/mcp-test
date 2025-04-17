@@ -10,8 +10,6 @@ from mcp.client.stdio import stdio_client
 
 import util
 from prompt_manager import PromptManager
-from tooljson import ToolCallParser
-from tool_call_manager import ToolCallManager
 
 
 class MCPClient:
@@ -78,37 +76,78 @@ class MCPClient:
         print("Sending system_message:", system_message)
         print("\n\n")
 
-        prompt_mgr = PromptManager(system_message)
-        prompt_mgr.add_user_message(query)
+        messages = [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": query}
+        ]
 
         while True:
             # 1. 调用大模型
-            # prompt_mgr.dialog = compress_dialog(prompt_mgr.dialog, max_tokens=4096)
-            response_json = await util.ollama_chat(prompt_mgr.get_messages())
+            response_json = await util.ollama_chat(messages)
             response_content = response_json["message"]["content"]
 
             # 2. 检查终止条件
             if "Final Answer:" in response_content:
                 return response_content.split("Final Answer:")[1].strip()
 
-            # 假设你已经拿到 response_content
-            tool_calls = ToolCallManager.parse_tool_calls(response_content)
-
-            if not tool_calls:
-                # 没有工具调用，直接返回
-                return response_content
-
-            # 有工具调用，先记录 assistant 输出
-            prompt_mgr.add_assistant_message(response_content)
-
-            for tool_call in tool_calls:
+            # 3. 尝试提取工具调用
+            if tool_request := util.extract_json(response_content):
                 try:
-                    tool_name = tool_call["tool"]
-                    args = tool_call["arguments"]
-                    tool_result = await self.session.call_tool(tool_name, args)
-                    prompt_mgr.add_tool_result(tool_result)
+                    # 4. 调用MCP工具
+                    tool_result = await self.session.call_tool(
+                        tool_request["tool"],
+                        tool_request["arguments"]
+                    )
+
+                    # 5. 保存上下文
+                    messages.extend([
+                        {"role": "assistant", "content": response_content},
+                        {
+                            "role": "tool",
+                            "content": json.dumps(tool_result),
+                            "tool_call_id": str(hash(tool_request["tool"]))
+                        }
+                    ])
                 except Exception as e:
-                    prompt_mgr.add_tool_result({"error": str(e)})
+                    messages.append({
+                        "role": "tool",
+                        "content": json.dumps({"error": str(e)}),
+                        "tool_call_id": "..."
+                    })
+            else:
+                return response_content  # 无法识别工具调用时直接返回
+
+        # response_json = await util.ollama_chat(messages)
+        # response_content = response_json["message"]["content"]
+        # print("deepseek输出content", response_content)
+        #
+        # if util.should_terminate(response_content):
+        #     return response_content
+        #
+        # json_pattern = r'\{(?:[^{}]|\{[^{}]*\})*\}'
+        # tool_request_json = re.search(json_pattern, response_content, re.DOTALL)
+        # print("提取到的JSON:", tool_request_json.group())
+        # json_block = json.loads(tool_request_json.group())
+        # if tool_request_json:
+        #     try:
+        #         tool_name = json_block.get("tool")
+        #         args = json_block.get("arguments", {})
+        #
+        #         # 调用工具并获取结果
+        #         tool_result = await self.session.call_tool(tool_name, args)
+        #
+        #         # 将结果反馈给模型生成最终回复
+        #         messages.append({
+        #             "role": "tool",
+        #             "content": json.dumps(tool_result),
+        #             "tool_call_id": str(hash(tool_name))  # 唯一标识
+        #         })
+        #         return await util.ollama_chat(messages)
+        #
+        #     except Exception as e:
+        #         return f"工具调用失败: {str(e)}"
+        # else:
+        #     return response_content  # 直接返回模型回复
 
     async def chat_loop(self):
         """Run an interactive chat loop"""
