@@ -1,5 +1,3 @@
-from agent_runner import AgentRunner
-
 import asyncio
 import sys
 from contextlib import AsyncExitStack
@@ -7,6 +5,7 @@ from typing import Optional
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+from agent_runner import AgentRunner
 
 
 
@@ -15,7 +14,6 @@ class MCPClient:
         # Initialize session and client objects
         self.session: Optional[ClientSession] = None
         self.exit_stack = AsyncExitStack()
-        # self.anthropic = Anthropic()
 
     async def connect_to_server(self, server_script_path: str):
         """Connect to an MCP server
@@ -39,8 +37,6 @@ class MCPClient:
 
     async def process_query(self, query: str) -> str:
         """Process a query using Claude and available tools"""
-
-        from agent_runner import AgentRunner
 
         runner = AgentRunner(self.session)
         response = await runner.run(query)
