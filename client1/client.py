@@ -1,11 +1,14 @@
 import asyncio
+import json
+import re
 import sys
 from contextlib import AsyncExitStack
 from typing import Optional
 
-import httpx
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
+import util
 
 
 class MCPClient:
@@ -14,8 +17,6 @@ class MCPClient:
         self.session: Optional[ClientSession] = None
         self.exit_stack = AsyncExitStack()
         # self.anthropic = Anthropic()
-        self.ollama_url = "http://localhost:11434/api/chat"
-        self.model_name = "deepseek-r1:7b"
 
     async def connect_to_server(self, server_script_path: str):
         """Connect to an MCP server
@@ -31,36 +32,9 @@ class MCPClient:
         stdio_transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
         self.stdio, self.write = stdio_transport
         self.session = await self.exit_stack.enter_async_context(ClientSession(self.stdio, self.write))
-
         await self.session.initialize()
-
         response = await self.session.list_tools()
-        tools = response.tools
-        print("\nConnected to server with tools:", [tool.name for tool in tools])
-
-
-    async def ollama_chat(self, messages):
-        payload = {
-            "model": self.model_name,
-            "messages": messages,
-            "stream": False  # 关闭流式返回
-        }
-        print("Sending payload:", payload)
-
-        async with httpx.AsyncClient(timeout=60) as client:
-            response = await client.post(self.ollama_url, json=payload)
-            print("ds-response:", response.json())
-
-            try:
-                response.raise_for_status()
-            except httpx.HTTPStatusError as e:
-                print("Ollama API 请求失败！")
-                print("响应状态码:", e.response.status_code)
-                print("响应内容:", e.response.text)
-                raise
-
-        print("Received payload:", response.json())
-        return response.json()
+        print("\nConnected to server with tools:", [tool for tool in response.tools])
 
     # -------------------------------------------------------------------
 
@@ -68,100 +42,111 @@ class MCPClient:
         """Process a query using Claude and available tools"""
 
         response = await self.session.list_tools()
-        print("\nresponse:", response)
         available_tools = [{
             "name": tool.name,
             "description": tool.description,
             "input_schema": tool.inputSchema
         } for tool in response.tools]
 
-        tools_description = self.format_tools_prompt(available_tools)
+        tools_description = util.format_tools_prompt(available_tools)
 
         system_message = (
-        "You are a helpful assistant with access to these tools:\n\n"
-        f"{tools_description}\n"
-        "Choose the appropriate tool based on the user's question. "
-        "If no tool is needed, reply directly.\n\n"
-        "IMPORTANT: When you need to use a tool, you must ONLY respond with "
-        "the exact JSON object format below, nothing else:\n"
-        "{\n"
-        '   "tool": "tool-name",\n'
-        '   "arguments": {\n'
-        '           "argument-name": "value"\n'
-            " }\n"
-        "}\n\n"
-        "After receiving a tool's response:\n"
-        "1. Transform the raw data into a natural, conversational response\n"
-        "2. Keep responses concise but informative\n"
-        "3. Focus on the most relevant information\n"
-        "4. Use appropriate context from the user's question\n"
-        "5. Avoid simply repeating the raw data\n\n"
-        "Please use only the tools that are explicitly defined above.")
+            f"""You are a helpful assistant with access to the following tools:
+        {tools_description}
+
+        ---
+
+        📌 任务规则：
+
+        🎯 请根据用户问题选择最合适的工具。  
+        若无需调用工具，直接回答，格式如下：  
+        `Final Answer: [你的回复]`
+
+        🛑 当需要使用工具时，**必须仅输出以下格式的 JSON（严格按照格式，无其他内容）：**
+        ```json
+        {{
+          "tool": "tool-name",
+          "arguments": {{
+            "argument-name": "value"
+          }}
+        }}"""
+        )
+
+        print("Sending system_message:", system_message)
+        print("\n\n")
 
         messages = [
             {"role": "system", "content": system_message},
             {"role": "user", "content": query}
         ]
 
-        print("Sending messages:", messages)
+        while True:
+            # 1. 调用大模型
+            response_json = await util.ollama_chat(messages)
+            response_content = response_json["message"]["content"]
 
-        response_json = await self.ollama_chat(messages)
-        print("Received response:", response_json)
-        content_blocks = response_json.get("message", {}).get("content", "")
+            # 2. 检查终止条件
+            if "Final Answer:" in response_content:
+                return response_content.split("Final Answer:")[1].strip()
 
-        # Process response and handle tool calls
-        final_text = [content_blocks]
-        # 假设 Ollama 返回的 content 是字符串
+            # 3. 尝试提取工具调用
+            if tool_request := util.extract_json(response_content):
+                try:
+                    # 4. 调用MCP工具
+                    tool_result = await self.session.call_tool(
+                        tool_request["tool"],
+                        tool_request["arguments"]
+                    )
 
-        assistant_message_content = []
-        for content in response.content:
-            if content.type == 'text':
-                final_text.append(content.text)
-                assistant_message_content.append(content)
-            elif content.type == 'tool_use':
-                tool_name = content.name
-                tool_args = content.input
-
-                # Execute tool call
-                result = await self.session.call_tool(tool_name, tool_args)
-                final_text.append(f"[Calling tool {tool_name} with args {tool_args}]")
-
-                assistant_message_content.append(content)
-                messages.append({
-                    "role": "assistant",
-                    "content": assistant_message_content
-                })
-                messages.append({
-                    "role": "user",
-                    "content": [
+                    # 5. 保存上下文
+                    messages.extend([
+                        {"role": "assistant", "content": response_content},
                         {
-                            "type": "tool_result",
-                            "tool_use_id": content.id,
-                            "content": result.content
+                            "role": "tool",
+                            "content": json.dumps(tool_result),
+                            "tool_call_id": str(hash(tool_request["tool"]))
                         }
-                    ]
-                })
+                    ])
+                except Exception as e:
+                    messages.append({
+                        "role": "tool",
+                        "content": json.dumps({"error": str(e)}),
+                        "tool_call_id": "..."
+                    })
+            else:
+                return response_content  # 无法识别工具调用时直接返回
 
-                # Get next response from Claude
-                response = self.anthropic.messages.create(
-                    model="claude-3-5-sonnet-20241022",
-                    max_tokens=1000,
-                    messages=messages,
-                    tools=available_tools
-                )
-
-                final_text.append(response.content[0].text)
-
-        return "\n".join(final_text)
-
-    def format_tools_prompt(self, tools):
-        prompt = "你是一个智能助手，可以根据用户的请求，必要时调用工具来完成任务：\n"
-        for tool in tools:
-            name = tool.get("name", "")
-            desc = tool.get("description", "")
-            input_schema = tool.get("input_schema", {})
-            prompt += f"\n工具名: {name}\n说明: {desc}\n参数结构: {input_schema}\n"
-        return prompt
+        # response_json = await util.ollama_chat(messages)
+        # response_content = response_json["message"]["content"]
+        # print("deepseek输出content", response_content)
+        #
+        # if util.should_terminate(response_content):
+        #     return response_content
+        #
+        # json_pattern = r'\{(?:[^{}]|\{[^{}]*\})*\}'
+        # tool_request_json = re.search(json_pattern, response_content, re.DOTALL)
+        # print("提取到的JSON:", tool_request_json.group())
+        # json_block = json.loads(tool_request_json.group())
+        # if tool_request_json:
+        #     try:
+        #         tool_name = json_block.get("tool")
+        #         args = json_block.get("arguments", {})
+        #
+        #         # 调用工具并获取结果
+        #         tool_result = await self.session.call_tool(tool_name, args)
+        #
+        #         # 将结果反馈给模型生成最终回复
+        #         messages.append({
+        #             "role": "tool",
+        #             "content": json.dumps(tool_result),
+        #             "tool_call_id": str(hash(tool_name))  # 唯一标识
+        #         })
+        #         return await util.ollama_chat(messages)
+        #
+        #     except Exception as e:
+        #         return f"工具调用失败: {str(e)}"
+        # else:
+        #     return response_content  # 直接返回模型回复
 
     async def chat_loop(self):
         """Run an interactive chat loop"""
@@ -201,3 +186,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+# uv run client.py ../weather/weather.py
