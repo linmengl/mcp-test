@@ -35,6 +35,7 @@ async def main():
 
         while True:
             query = input("🔍 Query: ").strip()
+            if query == "": break
             if query.lower() == 'quit':
                 break
 
@@ -51,6 +52,7 @@ async def main():
 
             response = await agent.run(query)
 
+            print("\n--------------------------------------\n")
             print("\n💬 Final Answer:")
             print(response)
             print("\n--------------------------------------\n")
