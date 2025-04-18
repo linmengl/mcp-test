@@ -1,6 +1,5 @@
 import asyncio
 import json
-import re
 import sys
 from contextlib import AsyncExitStack
 from typing import Optional
@@ -8,18 +7,17 @@ from typing import Optional
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
-import util
-from prompt_manager import PromptManager
-from tooljson import ToolCallParser
-from tool_call_manager import ToolCallManager
+import util1 as util
+from prompt_manager1 import PromptManager
+from tool_call_manager1 import ToolCallManager
 
 
 class MCPClient:
     def __init__(self):
         # Initialize session and client objects
         self.session: Optional[ClientSession] = None
+        # 创建一个异步退出栈
         self.exit_stack = AsyncExitStack()
-        # self.anthropic = Anthropic()
 
     async def connect_to_server(self, server_script_path: str):
         """Connect to an MCP server
@@ -31,7 +29,7 @@ class MCPClient:
             args=[server_script_path],
             env=None
         )
-
+        # 用 AsyncExitStack 来管理 stdio_client(...) 这个异步上下文，确保用完后会自动关闭或释放资源
         stdio_transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
         self.stdio, self.write = stdio_transport
         self.session = await self.exit_stack.enter_async_context(ClientSession(self.stdio, self.write))
@@ -94,6 +92,8 @@ class MCPClient:
             # 假设你已经拿到 response_content
             tool_calls = ToolCallManager.parse_tool_calls(response_content)
 
+            print("tool_calls:", tool_calls)
+
             if not tool_calls:
                 # 没有工具调用，直接返回
                 return response_content
@@ -106,7 +106,12 @@ class MCPClient:
                     tool_name = tool_call["tool"]
                     args = tool_call["arguments"]
                     tool_result = await self.session.call_tool(tool_name, args)
-                    prompt_mgr.add_tool_result(tool_result)
+                    print("got tool result:", tool_result)
+                    if tool_result.isError:
+                        print("工具调用失败", tool_result)
+                        return response_content
+                    actual_dict = json.loads(tool_result.content[0].text)
+                    prompt_mgr.add_tool_result(actual_dict)
                 except Exception as e:
                     prompt_mgr.add_tool_result({"error": str(e)})
 

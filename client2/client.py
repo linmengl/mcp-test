@@ -1,86 +1,64 @@
+import argparse
 import asyncio
-import sys
-from contextlib import AsyncExitStack
-from typing import Optional
 
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
+
 from agent_runner import AgentRunner
 
 
+async def main():
+    parser = argparse.ArgumentParser(description="MCP Agent Runner")
+    parser.add_argument("server", help="Path to server script (.py or .js)")
+    parser.add_argument("--debug", action="store_true", help="Enable step-by-step debug mode")
+    parser.add_argument("--mode", choices=["auto", "tool-first", "llm-first"], default="auto",
+                        help="Agent behavior mode")
+    args = parser.parse_args()
 
-class MCPClient:
-    def __init__(self):
-        # Initialize session and client objects
-        self.session: Optional[ClientSession] = None
-        self.exit_stack = AsyncExitStack()
+    # 启动 MCP Server
+    server_params = StdioServerParameters(
+        command="python",
+        args=[args.server],
+        env=None
+    )
 
-    async def connect_to_server(self, server_script_path: str):
-        """Connect to an MCP server
-        Args:
-            server_script_path: Path to the server script (.py or .js)
-        """
-        server_params = StdioServerParameters(
-            command="python",
-            args=[server_script_path],
-            env=None
-        )
+    print("🚀 Connecting to MCP server...")
+    async with stdio_client(server_params) as (stdio, write), ClientSession(stdio, write) as session:
+        await session.initialize()
+        print("✅ Connected to MCP server.")
 
-        stdio_transport = await self.exit_stack.enter_async_context(stdio_client(server_params))
-        self.stdio, self.write = stdio_transport
-        self.session = await self.exit_stack.enter_async_context(ClientSession(self.stdio, self.write))
-        await self.session.initialize()
-        response = await self.session.list_tools()
-        print("\nConnected to server with tools:", [tool for tool in response.tools])
+        agent = AgentRunner(session, behavior_mode=args.mode)
 
-    # -------------------------------------------------------------------
-
-    async def process_query(self, query: str) -> str:
-        """Process a query using Claude and available tools"""
-
-        runner = AgentRunner(self.session)
-        response = await runner.run(query)
-        print("\n✅ Final Answer:", response)
-
-    async def chat_loop(self):
-        """Run an interactive chat loop"""
-        print("\nMCP Client Started!")
-        print("Type your queries or 'quit' to exit.")
+        print("\n🤖 MCP Agent Ready!")
+        print(f"Behavior mode: {args.mode}")
+        print("Type your query. Use 'quit' to exit.\n")
 
         while True:
-            try:
-                query = input("\nQuery: ").strip()
+            query = input("🔍 Query: ").strip()
+            if query.lower() == 'quit':
+                break
 
-                if query.lower() == 'quit':
-                    break
+            if args.debug:
+                print("\n⚙️ Step-by-step debug enabled.")
+                input("Press Enter to start model reasoning...")
 
-                response = await self.process_query(query)
-                print("\n" + response)
+            if args.mode == "tool-first":
+                print("🔧 Forcing tool-first mode. Wrapping user query for tool preference.")
+                query = f"请优先判断是否可调用工具来完成此请求：{query}"
+            elif args.mode == "llm-first":
+                print("🧠 Forcing LLM-first mode. Wrapping user query for LLM preference.")
+                query = f"请尽可能直接回答此请求，除非确实需要使用工具：{query}"
 
-            except Exception as e:
-                print(f"\nError: {str(e)}")
+            response = await agent.run(query)
 
-    async def cleanup(self):
-        """Clean up resources"""
-        await self.exit_stack.aclose()
-
-
-async def main():
-    if len(sys.argv) < 2:
-        print("Usage: python client.py <path_to_server_script>")
-        sys.exit(1)
-
-    client = MCPClient()
-    try:
-        await client.connect_to_server(sys.argv[1])
-        await client.chat_loop()
-    finally:
-        await client.cleanup()
+            print("\n💬 Final Answer:")
+            print(response)
+            print("\n--------------------------------------\n")
+            if args.debug:
+                input("Press Enter to continue...")
 
 
 if __name__ == "__main__":
     asyncio.run(main())
 
 # uv run client.py ../weather/weather.py
-
-

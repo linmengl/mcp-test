@@ -26,32 +26,6 @@ def extract_json(content: str) -> Optional[dict]:
                 pass
     return None
 
-def format_tools_prompt(tools):
-    prompt = ""
-    for tool in tools:
-        name = tool.get("name", "")
-        desc = tool.get("description", "")
-        input_schema = tool.get("input_schema", {})
-        prompt += f"\ntool-name: {name}\n说明: {desc}\n参数结构: {input_schema}\n"
-    print("prompt:", prompt)
-    return prompt
-
-def should_terminate( response):
-    # 优先级1：检测终止标记
-    if "Final Answer:" in response:
-        return True
-
-    # 优先级2：验证JSON有效性
-    try:
-        import json
-        json.loads(response)
-        return True  # 有效JSON视为可终止
-    except ValueError:
-        # 尝试提取嵌入式JSON
-        if extracted_json := extract_json(response):
-            return True
-    return False
-
 async def ollama_chat(messages):
     print("\nPrompt 给模型：\n", messages)
     payload = {
